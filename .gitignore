@@ -2,3 +2,4 @@ data/
 *.gz
 *.tar.gz
 *.tar
+fastText/
