@@ -28,9 +28,9 @@ def txt2list(filename):
             # Remove punctuations
             line = [char.lower() for char in line if char not in string.punctuation]
             line = ''.join(line)
-            # Remove stop words or words not in corpus
+            # Remove stop words
             context.extend([word for word in line.strip().split()
-                            if (word not in stopwords.words('english')) and (word in words.words())])
+                            if word not in stopwords.words('english')])
 
     return context
 
@@ -45,7 +45,7 @@ def build_vocab(vocab_dict, context):
 
 
 class WholeData(data.Dataset):
-    def __init__(self, data_dir, max_len=MAX_SENT_LENGTH, use_max_len=False):
+    def __init__(self, data_dir, src_vocab=None, max_len=MAX_SENT_LENGTH, use_max_len=False):
         # Should use all context
 
         self.max_len = max_len
@@ -55,6 +55,9 @@ class WholeData(data.Dataset):
         good_mails = glob.glob(ham_path+"*.txt")
         bad_mails = glob.glob(spam_path+"*.txt")
 
+        if src_vocab is not None:
+            self.vocab = src_vocab
+
         vocab_dict = {}
         self.context = []
         self.label_list = []
@@ -63,7 +66,10 @@ class WholeData(data.Dataset):
             context = txt2list(filename)
             if not use_max_len:
                 self.max_len = max(self.max_len, len(context))
-            build_vocab(vocab_dict, context)
+
+            if src_vocab is None:
+                build_vocab(vocab_dict, context)
+    
             # add the content of a single email to dataset
             self.context.append(context)
             self.label_list.append(1)
@@ -72,7 +78,10 @@ class WholeData(data.Dataset):
             context = txt2list(filename)
             if not use_max_len:
                 self.max_len = max(self.max_len, len(context))
-            build_vocab(vocab_dict, context)
+            
+            if src_vocab is None:
+                build_vocab(vocab_dict, context)
+
             self.context.append(context)
             self.label_list.append(0)
         
