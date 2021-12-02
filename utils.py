@@ -48,6 +48,8 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
     num_batches = len(dataloader)
     total_loss = 0
     correct_cases = 0
+    precision = 0
+    recall = 0
     # counter for printing training loss
     # cnt = 0
 
@@ -75,11 +77,23 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
     return total_loss/num_batches, correct_cases/num_batches
 
 
-def test_loop(dataloader, model, loss_fn, device):
+def test_loop(dataloader, model, loss_fn, device, output_stats=False):
+    """
+    Perform one iteration of test loop
+    Return:
+    - loss
+    - accuracy
+    (optional)
+    - precision
+    - recall
+    """
 
     num_batches = len(dataloader)
     total_loss = 0
     correct_cases = 0
+    true_pos = 0
+    total_pos = 0
+    false_neg = 0
 
     model.eval()
     with torch.no_grad():
@@ -90,11 +104,20 @@ def test_loop(dataloader, model, loss_fn, device):
             # squeeze to match the dimensions of pred and y
             total_loss += loss_fn(pred, y.float()).item()
             correct_cases += torch.sum((pred>0.5) == (y>0)).item()/X.shape[0]
+            true_pos += torch.sum((pred>0.5) & (y>0)).item()
+            total_pos += torch.sum((pred>0.5)).item()
+            false_neg += torch.sum((y>0)).item() - true_pos
 
-    return total_loss/num_batches, correct_cases/num_batches
+    if output_stats:
+        precision = true_pos/total_pos
+        recall = true_pos/(true_pos+false_neg)
+        return total_loss/num_batches, correct_cases/num_batches, precision, recall
+    else:
+        return total_loss/num_batches, correct_cases/num_batches
+
 
 def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, optimizer, task_name,
-                         device="cuda", epochs=100, vis=False, print_every=5, img_dir=""):
+                         device="cuda", epochs=100, vis=True, print_every=5, img_dir=""):
     """
     Perform `epochs` loops of training and test the model once. Returns the final results of training 
     and testing.
@@ -145,11 +168,13 @@ def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, opti
             print(f"Training loss: {train_loss:>5f}, avg accuracy: {train_acc:>3f}")
             print(f"Testing loss: {test_loss:>5f}, avg accuracy: {test_acc:>3f}")
 
-    plot_train_test_loss(epochs, loss_list, test_loss_list, title=task_name+" loss", filename=img_dir+task_name+"train_loss")
-    plot_acc(epochs, acc_list, test_acc_list, title=task_name+" accuracy", filename=img_dir+task_name+"train_acc")
+    if vis:
+        plot_train_test_loss(epochs, loss_list, test_loss_list, title=task_name+" loss", filename=img_dir+task_name+"train_loss")
+        plot_acc(epochs, acc_list, test_acc_list, title=task_name+" accuracy", filename=img_dir+task_name+"train_acc")
 
-    test_loss, test_acc = test_loop(test_dataloader, model, loss_fn, device)
+    test_loss, test_acc, precision, recall = test_loop(test_dataloader, model, loss_fn, device, output_stats=True)
     print(f"Final testing loss: {test_loss:>5f}, testing accuracy: {test_acc:>3f}")
+    print(f"F1 score: {2*precision*recall/(precision+recall):3f} Precision: {precision:3f}, Recall: {recall:3f}")
 
     return train_loss, test_loss
 
