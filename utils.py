@@ -56,15 +56,16 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
         X, y = X.to(device), y.to(device)
     
         pred = model(X)
+        pred = torch.squeeze(pred)
         # squeeze to match the dimensions of pred and y
-        loss = loss_fn(torch.squeeze(pred), y.float())
+        loss = loss_fn(pred, y.float())
 
         # Backpropagation
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
         total_loss += loss.item()
-        correct_cases += torch.sum(torch.squeeze(pred) == y).item()/X.shape[0]
+        correct_cases += torch.sum((pred > 0.5) == y.astype(bool)).item()/X.shape[0]
         # if cnt % 100:
         #    print(f"Current avg loss:{total_loss/(cnt+1)}\n")
         # cnt += 1   
@@ -84,9 +85,10 @@ def test_loop(dataloader, model, loss_fn, device):
         for X, y in dataloader:
             X, y = X.to(device), y.to(device)
             pred = model(X)
+            pred = torch.squeeze(pred)
             # squeeze to match the dimensions of pred and y
-            total_loss += loss_fn(torch.squeeze(pred), y.float()).item()
-            correct_cases += torch.sum(torch.squeeze(pred) == y).item()/X.shape[0]
+            total_loss += loss_fn(pred, y.float()).item()
+            correct_cases += torch.sum((pred>0.5) == y.astype(bool)).item()/X.shape[0]
 
     return total_loss/num_batches, correct_cases/num_batches
 

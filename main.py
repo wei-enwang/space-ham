@@ -26,9 +26,11 @@ batch_size = 64
 dropout = 0.1
 learning_rate = 1e-3
 epochs = 30
+max_len = 300
 
-train_dataset = WholeData(train_data_dir)
-test_dataset = WholeData(test_data_dir)
+
+train_dataset = WholeData(train_data_dir, use_max_len=True, max_len=max_len)
+test_dataset = WholeData(test_data_dir, use_max_len=True, max_len=max_len)
 
 train_dataloader = data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=8, pin_memory=True)
 test_dataloader = data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=True)

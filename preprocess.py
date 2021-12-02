@@ -92,16 +92,16 @@ class WholeData(data.Dataset):
         text = self.context[index]
         label = self.label_list[index]
 
-        sent_len = len(text)
-        sent_id = []
-        for w in text:
+        sent_id = [PAD_INDEX for _ in range(self.max_len)]
+        for i, w in enumerate(text):
+            if i >= self.max_len:
+                break
             if w not in self.vocab:
                 w = '<unk>'
-            sent_id.append(self.src_v2id[w])
-        src_id = (sent_id + [PAD_INDEX] * (self.max_len - sent_len))
+            sent_id[i] = self.src_v2id[w]
 
         # Return context length?
-        return torch.tensor(src_id), label
+        return torch.tensor(sent_id), label
 
 
 
