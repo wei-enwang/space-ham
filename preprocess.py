@@ -1,16 +1,15 @@
 import torch
 from torch.utils import data
 import os.path
+import io
 import glob
-
+import pdb
 import string
 import nltk
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 nltk.download('stopwords')
-
-
 
 # These IDs are reserved.
 PAD_INDEX = 0
@@ -24,7 +23,7 @@ MAX_SENT_LENGTH = 100
 # Remove all punctuations and stopwords using ntlk
 def txt2list(filename):
     context = []
-    with open(filename, "r") as f:
+    with io.open(filename, "r", encoding="ascii", errors="ignore") as f:
         for line in f:
             # Remove punctuations
             line = [char for char in line if char not in string.punctuation]
