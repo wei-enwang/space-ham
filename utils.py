@@ -53,7 +53,7 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
         # Compute prediction and loss
         X, y = X.to(device), y.to(device)
     
-        pred = model(X.float())
+        pred = model(X)
         loss = loss_fn(pred, y.float())
 
         # Backpropagation
@@ -78,7 +78,7 @@ def test_loop(dataloader, model, loss_fn, device):
     with torch.no_grad():
         for X, y in dataloader:
             X, y = X.to(device), y.to(device)
-            pred = model(X.float())
+            pred = model(X)
 
             total_loss += loss_fn(pred, y.float()).item()
 

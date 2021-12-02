@@ -35,11 +35,12 @@ test_dataloader = data.DataLoader(test_dataset)
 w2idx = train_dataset.src_v2id
 
 embed = utils.load_pretrained_vectors(w2idx, "fastText/crawl-300d-2M.vec")
+embed = torch.tensor(embed)
 
 model = models.spam_lstm(pretrained_embedding=embed, dropout=dropout).to(device)
 loss_fn = nn.BCEWithLogitsLoss().to(device)
 opt = Adam(model.parameters(), lr=learning_rate)
 
-utils.train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, optimizer=opt, print_every=1, img_dir=output_dir)
+utils.train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, optimizer=opt, epochs=epochs, print_every=1, img_dir=output_dir)
 
 torch.save(model.state_dict(), output_dir+"w2v_lstm.pt")
