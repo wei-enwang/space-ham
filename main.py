@@ -22,7 +22,7 @@ test_data_dir = "./data/enron2/"
 output_dir = "./output/"
 
 # hyperparameters
-batch_size = 128
+batch_size = 64
 dropout = 0.1
 learning_rate = 1e-3
 epochs = 30
@@ -30,8 +30,8 @@ epochs = 30
 train_dataset = WholeData(train_data_dir)
 test_dataset = WholeData(test_data_dir)
 
-train_dataloader = data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=8)
-test_dataloader = data.DataLoader(test_dataset)
+train_dataloader = data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=8, pin_memory=True)
+test_dataloader = data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=True)
 w2idx = train_dataset.src_v2id
 
 embed = utils.load_pretrained_vectors(w2idx, "fastText/crawl-300d-2M.vec")

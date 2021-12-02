@@ -46,7 +46,8 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
     """
     num_batches = len(dataloader)
     total_loss = 0
-    cnt = 0
+    # counter for printing training loss
+    # cnt = 0
 
     model.train()
     for X, y in dataloader:
@@ -54,16 +55,17 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
         X, y = X.to(device), y.to(device)
     
         pred = model(X)
-        loss = loss_fn(pred, y.float())
+        # squeeze to match the dimensions of pred and y
+        loss = loss_fn(torch.squeeze(pred), y.float())
 
         # Backpropagation
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
         total_loss += loss.item()
-        if cnt % 100:
-            print(f"Current avg loss:{total_loss/(cnt+1)}\n")
-        cnt += 1   
+        # if cnt % 100:
+        #    print(f"Current avg loss:{total_loss/(cnt+1)}\n")
+        # cnt += 1   
     # print(f"Training loss: {total_loss/num_batches:>5f}")
     
     return total_loss/num_batches
@@ -79,8 +81,8 @@ def test_loop(dataloader, model, loss_fn, device):
         for X, y in dataloader:
             X, y = X.to(device), y.to(device)
             pred = model(X)
-
-            total_loss += loss_fn(pred, y.float()).item()
+            # squeeze to match the dimensions of pred and y
+            total_loss += loss_fn(torch.squeeze(pred), y.float()).item()
 
     return total_loss/num_batches
 
