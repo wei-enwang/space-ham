@@ -3,4 +3,5 @@ data/
 *.tar.gz
 *.tar
 *.txt
+*.pyc
 fastText/
