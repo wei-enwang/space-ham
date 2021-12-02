@@ -8,7 +8,7 @@ import string
 import nltk
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
-from tqdm.utils import _text_width
+
 
 nltk.download('stopwords')
 
@@ -27,10 +27,10 @@ def txt2list(filename, max_len=None):
     with io.open(filename, "r", encoding="ascii", errors="ignore") as f:
         for line in f:
             # Remove punctuations
-            line = [char.lower() for char in line if char not in string.punctuation]
+            line = [char for char in line if char not in string.punctuation]
             line = ''.join(line)
             # Remove stop words
-            context.extend([word for word in line.strip().split()
+            context.extend([word.lower() for word in line.strip().split()
                             if word not in stopwords.words('english')])
             if not max_len is None:
                 if len(context) >= max_len:
