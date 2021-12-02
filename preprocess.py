@@ -6,7 +6,7 @@ import glob
 import pdb
 import string
 import nltk
-from nltk.corpus import stopwords
+from nltk.corpus import stopwords, words
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 nltk.download('stopwords')
@@ -26,11 +26,11 @@ def txt2list(filename):
     with io.open(filename, "r", encoding="ascii", errors="ignore") as f:
         for line in f:
             # Remove punctuations
-            line = [char for char in line if char not in string.punctuation]
+            line = [char.lower() for char in line if char not in string.punctuation]
             line = ''.join(line)
-            # Remove stop words
+            # Remove stop words or words not in corpus
             context.extend([word for word in line.strip().split()
-                            if word not in stopwords.words('english')])
+                            if (word not in stopwords.words('english')) and (word in words.words())])
 
     return context
 

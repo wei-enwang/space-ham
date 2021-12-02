@@ -92,7 +92,7 @@ def test_loop(dataloader, model, loss_fn, device):
 
     return total_loss/num_batches, correct_cases/num_batches
 
-def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, optimizer, 
+def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, optimizer, task_name,
                          device="cuda", epochs=100, vis=False, print_every=5, img_dir=""):
     """
     Perform `epochs` loops of training and test the model once. Returns the final results of training 
@@ -124,14 +124,29 @@ def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, opti
     """    
 
     loss_list = []
+    acc_list = []
+
+    test_loss_list = []
+    test_acc_list = []
+
     for t in tqdm(range(epochs)):
         train_loss, train_acc = train_loop(train_dataloader, model, loss_fn, optimizer, device)
+        test_loss, test_acc = test_loop(test_dataloader, model, loss_fn, device) 
+
         loss_list.append(train_loss)
+        acc_list.append(train_acc)
+
+        test_loss_list.append(test_loss)
+        test_acc_list.append(test_acc)
+
         if t % print_every == 0:
             print(f"Epoch {t}\n-------------------------------")
             print(f"Training loss: {train_loss:>5f}, avg accuracy: {train_acc:>3f}")
+            print(f"Testing loss: {test_loss:>5f}, avg accuracy: {test_acc:>3f}")
 
-    plot_loss(epochs, loss_list, title="baseline model(training)", filename=img_dir+"train_loss")
+    plot_loss(epochs, loss_list, title=task_name+" training loss", filename=img_dir+task_name+"train_loss")
+    plot_acc(epochs, acc_list, title=task_name+" training accuracy", filename=img_dir+task_name+"train_acc")
+
     test_loss, test_acc = test_loop(test_dataloader, model, loss_fn, device)
     print(f"Final testing loss: {test_loss:>5f}, testing accuracy: {test_acc:>3f}")
 
@@ -268,6 +283,21 @@ def plot_loss(epochs, train_loss, title="", filename=None):
     plt.plot(range(epochs), train_loss, label='training')
     plt.xlabel('epoch')
     plt.ylabel('loss')
+    plt.title(title)
+    plt.legend()
+    if filename:
+        plt.savefig(filename)
+    else:
+        plt.show()
+
+
+def plot_acc(epochs, acc, title="", filename=None):
+
+    # Plot epoch loss
+    plt.figure(facecolor="white")
+    plt.plot(range(epochs), acc, label='training')
+    plt.xlabel('epoch')
+    plt.ylabel('accuracy')
     plt.title(title)
     plt.legend()
     if filename:
