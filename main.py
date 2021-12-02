@@ -30,10 +30,10 @@ output_dir = "./output/"
 
 # hyperparameters
 batch_size = 64
-dropout = 0.1
-learning_rate = 1e-3
+dropout = 0.5
+learning_rate = 1e-4
 epochs = 30
-max_len = 300
+max_len = 100
 
 vocab = set([str.lower() for str in words.words()])
 
