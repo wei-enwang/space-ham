@@ -55,8 +55,7 @@ class WholeData(data.Dataset):
         good_mails = glob.glob(ham_path+"*.txt")
         bad_mails = glob.glob(spam_path+"*.txt")
 
-        if src_vocab is not None:
-            self.vocab = src_vocab
+        
 
         vocab_dict = {}
         self.context = []
@@ -85,7 +84,10 @@ class WholeData(data.Dataset):
             self.context.append(context)
             self.label_list.append(0)
         
-        self.vocab = vocab_dict.keys()
+        if src_vocab is not None:
+            self.vocab = src_vocab
+        else:
+            self.vocab = vocab_dict.keys()
 
         # pad_index is reserved at 0, unk_index is reserved at 1
         self.src_v2id = {v : i+2 for i, v in enumerate(self.vocab)}
