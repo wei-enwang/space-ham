@@ -51,7 +51,7 @@ model = models.spam_lstm(pretrained_embedding=embed, dropout=dropout).to(device)
 loss_fn = nn.BCEWithLogitsLoss().to(device)
 opt = Adam(model.parameters(), lr=learning_rate)
 
-utils.train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, opt, 
+utils.train_test_scheme(train_dataloader, test_dataloader, model, loss_fn, opt, 
                            task_name="w2v+lstm300", device=device, epochs=epochs, 
                            vis=plot_yes, print_every=1, img_dir=output_dir)
 

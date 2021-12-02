@@ -93,7 +93,7 @@ def test_loop(dataloader, model, loss_fn, device, output_stats=False):
     correct_cases = 0
     true_pos = 0
     total_pos = 0
-    false_neg = 0
+    actual_pos = 0
 
     model.eval()
     with torch.no_grad():
@@ -106,11 +106,11 @@ def test_loop(dataloader, model, loss_fn, device, output_stats=False):
             correct_cases += torch.sum((pred>0.5) == (y>0)).item()/X.shape[0]
             true_pos += torch.sum((pred>0.5) & (y>0)).item()
             total_pos += torch.sum((pred>0.5)).item()
-            false_neg += torch.sum((y>0)).item() - true_pos
+            actual_pos += torch.sum((y>0)).item()
 
     if output_stats:
         precision = true_pos/total_pos
-        recall = true_pos/(true_pos+false_neg)
+        recall = true_pos/actual_pos
         return total_loss/num_batches, correct_cases/num_batches, precision, recall
     else:
         return total_loss/num_batches, correct_cases/num_batches
@@ -118,6 +118,63 @@ def test_loop(dataloader, model, loss_fn, device, output_stats=False):
 
 def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, optimizer, task_name,
                          device="cuda", epochs=100, vis=True, print_every=5, img_dir=""):
+    """
+    Perform `epochs` loops of training and test the model once. Returns the final results of training 
+    and testing.
+    Args:
+        training_dataloader:
+            Training set dataloader.
+        testing_data:
+            Testing set dataloader.
+        model:
+            Machine learning model.
+        loss_fn:
+            Loss function of the model.
+        optimizer:
+            Optimizer of the model.
+        device:
+            Device this model is trained on.
+        epochs (int):
+            The number of rounds of which the dataset is fed into the network.
+        print_every (int):
+            Frequency to print training loss.
+        img_dir (string):
+            Plots will be saved under this directory
+    Returns:
+        train_values (ndarray of shape (n_params, )):
+            Training results.
+        test_values (ndarray of shape (n_params, )):
+            Testing results.
+    """    
+
+    loss_list = []
+    acc_list = []
+
+    for t in tqdm(range(epochs)):
+        train_loss, train_acc = train_loop(train_dataloader, model, loss_fn, optimizer, device)
+        test_loss, test_acc = test_loop(test_dataloader, model, loss_fn, device) 
+
+        loss_list.append(train_loss)
+        acc_list.append(train_acc)
+
+
+        if t % print_every == 0:
+            print(f"Epoch {t}\n-------------------------------")
+            print(f"Training loss: {train_loss:>5f}, avg accuracy: {train_acc:>3f}")
+
+    if vis:
+        plot_loss(epochs, loss_list, title=task_name+" loss", filename=img_dir+task_name+"train_loss")
+        plot_acc(epochs, acc_list, title=task_name+" accuracy", filename=img_dir+task_name+"train_acc")
+
+    test_loss, test_acc, precision, recall = test_loop(test_dataloader, model, loss_fn, device, output_stats=True)
+    print(f"Final testing loss: {test_loss:>5f}, testing accuracy: {test_acc:>3f}")
+    print(f"F1 score: {2*precision*recall/(precision+recall):3f} Precision: {precision:3f}, Recall: {recall:3f}")
+
+    return train_loss, test_loss
+
+
+def train_test_scheme(train_dataloader, test_dataloader, model, loss_fn, optimizer, task_name,
+                      device="cuda", epochs=100, vis=True, print_every=5, img_dir=""):
     """
     Perform `epochs` loops of training and test the model once. Returns the final results of training 
     and testing.
@@ -170,7 +227,7 @@ def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, opti
 
     if vis:
         plot_train_test_loss(epochs, loss_list, test_loss_list, title=task_name+" loss", filename=img_dir+task_name+"train_loss")
-        plot_acc(epochs, acc_list, test_acc_list, title=task_name+" accuracy", filename=img_dir+task_name+"train_acc")
+        plot_train_test_acc(epochs, acc_list, test_acc_list, title=task_name+" accuracy", filename=img_dir+task_name+"train_acc")
 
     test_loss, test_acc, precision, recall = test_loop(test_dataloader, model, loss_fn, device, output_stats=True)
     print(f"Final testing loss: {test_loss:>5f}, testing accuracy: {test_acc:>3f}")
@@ -179,59 +236,6 @@ def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, opti
     return train_loss, test_loss
 
 # TODO: modify the functions after this line
-
-# def train_test_scheme(training_data, testing_data, model, loss_fn, optimizer=None, 
-#                       batch_size=300, epochs=200, device="cpu"):
-#     """
-#     Perform `epochs` loops of training and testing. The training and testing results of each epoch 
-#     are stored in `train_history` and `test_history`.
-
-#     Args:
-#         training_data (PyTorch DataSet class):
-#             Training set.
-#         testing_data (PyTorch DataSet class):
-#             Testing set.
-#         model:
-#             Machine learning model.
-#         loss_fn:
-#             Loss function of the model.
-#         optimizer:
-#             Optimizer of the model.
-#         batch_size (int):
-#             The size of samples fed into the network in each training iteration.
-#         epochs (int):
-#             The number of rounds of which the dataset is fed into the network.
-
-#     Returns:
-#         train_history (ndarray of shape (epochs, n_params)):
-#             Training results.
-#         test_history (ndarray of shape (epochs, n_params)):
-#             Testing results.
-#     """    
-#     pin = False
-#     if device == "cuda":
-#         pin == True
-
-#     train_dataloader = DataLoader(
-#         training_data, batch_size=batch_size, shuffle=True, drop_last=True, pin_memory=pin)
-
-#     big_test_dataloader = DataLoader(testing_data, batch_size=len(testing_data), pin_memory=pin)
-
-#     train_history = np.zeros((epochs, 5))
-#     test_history = np.zeros((epochs, 5))
-
-#     for t in tqdm(range(epochs)):
-#         print(f"Epoch {t+1}\n-------------------------------")
-#         train_history[t,:] = train_loop(train_dataloader, model, loss_fn, optimizer, device=device)
-
-#         test_history[t,:] = test_loop(big_test_dataloader, model, loss_fn, device=device)
-
-#     # for i in range(5):
-#     #     train_history[:,i] = utils.running_average(train_history[:,i])
-#     #     test_history[:,i] = utils.running_average(test_history[:,i])
-
-#     return train_history, test_history
-
 
 # def cross_validate_scheme(whole_dataset, model_class, loss_fn,
 #                           lr=0.01, batch_size=64, reg=0, epochs=10, k=5, 
@@ -336,7 +340,7 @@ def plot_train_test_acc(epochs, train_acc, test_acc, title="", filename=None):
     # Plot epoch loss
     plt.figure(facecolor="white")
     plt.plot(range(epochs), train_acc, label='training')
-    plt.plot(range(epochs), test_acc, label='training')
+    plt.plot(range(epochs), test_acc, label='testing')
     plt.xlabel('epoch')
     plt.ylabel('accuracy')
     plt.title(title)
@@ -346,12 +350,11 @@ def plot_train_test_acc(epochs, train_acc, test_acc, title="", filename=None):
     else:
         plt.show()
 
-def plot_acc(epochs, train_acc, test_acc, title="", filename=None):
+def plot_acc(epochs, train_acc, title="", filename=None):
 
     # Plot epoch loss
     plt.figure(facecolor="white")
     plt.plot(range(epochs), train_acc, label='training')
-    plt.plot(range(epochs), test_acc, label='testing')
     plt.xlabel('epoch')
     plt.ylabel('accuracy')
     plt.title(title)
