@@ -10,6 +10,7 @@ from nltk.corpus import stopwords, words
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 nltk.download('stopwords')
+nltk.download('words')
 
 # These IDs are reserved.
 PAD_INDEX = 0
