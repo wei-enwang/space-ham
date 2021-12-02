@@ -32,9 +32,10 @@ learning_rate = 1e-3
 epochs = 30
 max_len = 300
 
+vocab = set([str.lower() for str in words.words()])
 
-train_dataset = WholeData(train_data_dir, src_vocab=words.words(), use_max_len=True, max_len=max_len)
-test_dataset = WholeData(test_data_dir, src_vocab=words.words(), use_max_len=True, max_len=max_len)
+train_dataset = WholeData(train_data_dir, src_vocab=vocab, use_max_len=True, max_len=max_len)
+test_dataset = WholeData(test_data_dir, src_vocab=vocab, use_max_len=True, max_len=max_len)
 
 train_dataloader = data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=8, pin_memory=True)
 test_dataloader = data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=True)
@@ -47,6 +48,6 @@ model = models.spam_lstm(pretrained_embedding=embed, dropout=dropout).to(device)
 loss_fn = nn.BCEWithLogitsLoss().to(device)
 opt = Adam(model.parameters(), lr=learning_rate)
 
-utils.train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, optimizer=opt, epochs=epochs, print_every=1, img_dir=output_dir)
+utils.train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, opt, task_name="w2v+lstm300", epochs=epochs, print_every=1, img_dir=output_dir)
 
 torch.save(model.state_dict(), output_dir+"w2v_lstm.pt")

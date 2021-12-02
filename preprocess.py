@@ -107,6 +107,7 @@ class WholeData(data.Dataset):
         self.src_v2id['<pad>'] = PAD_INDEX
         self.src_v2id['<unk>'] = UNK_INDEX 
         self.src_id2v = {val : key for key, val in self.src_v2id.items()}
+        # print(len(self.src_v2id))        
 
 
     def __len__(self):

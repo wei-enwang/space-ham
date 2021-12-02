@@ -26,6 +26,8 @@ def load_pretrained_vectors(word2idx, filename):
     embeddings = np.random.uniform(-0.25, 0.25, (len(word2idx), d))
     embeddings[word2idx['<pad>']] = np.zeros((d,))
     embeddings[word2idx['<unk>']] = np.zeros((d,))
+    
+    print(max(word2idx.values()))
 
     # Load pretrained vectors
     count = 0
