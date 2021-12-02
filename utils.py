@@ -321,11 +321,12 @@ def plot_train_test_acc(epochs, train_acc, test_acc, title="", filename=None):
     else:
         plt.show()
 
-def plot_acc(epochs, acc, title="", filename=None):
+def plot_acc(epochs, train_acc, test_acc, title="", filename=None):
 
     # Plot epoch loss
     plt.figure(facecolor="white")
-    plt.plot(range(epochs), acc, label='training')
+    plt.plot(range(epochs), train_acc, label='training')
+    plt.plot(range(epochs), test_acc, label='testing')
     plt.xlabel('epoch')
     plt.ylabel('accuracy')
     plt.title(title)
