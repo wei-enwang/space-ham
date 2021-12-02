@@ -8,6 +8,7 @@ import string
 import nltk
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
+from tqdm.utils import _text_width
 
 nltk.download('stopwords')
 
@@ -65,7 +66,12 @@ class WholeData(data.Dataset):
         self.label_list = []
 
         for filename in good_mails:
-            context = txt2list(filename)
+
+            if use_max_len:
+                context = txt2list(filename, max_len)
+            else:
+                context = txt2list(filename)
+
             if not use_max_len:
                 self.max_len = max(self.max_len, len(context))
 
@@ -77,7 +83,11 @@ class WholeData(data.Dataset):
             self.label_list.append(1)
 
         for filename in bad_mails:
-            context = txt2list(filename)
+            if use_max_len:
+                context = txt2list(filename, max_len)
+            else:
+                context = txt2list(filename)
+
             if not use_max_len:
                 self.max_len = max(self.max_len, len(context))
             
