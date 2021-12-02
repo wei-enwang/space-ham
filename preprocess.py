@@ -6,11 +6,10 @@ import glob
 import pdb
 import string
 import nltk
-from nltk.corpus import stopwords, words
+from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 nltk.download('stopwords')
-nltk.download('words')
 
 # These IDs are reserved.
 PAD_INDEX = 0

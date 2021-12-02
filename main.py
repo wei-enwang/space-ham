@@ -1,4 +1,6 @@
 import numpy as np
+import nltk
+from nltk.corpus import words
 import torch
 import torch.nn as nn
 from torch.optim import Adam
@@ -7,6 +9,8 @@ from preprocess import WholeData
 
 import models
 import utils
+
+nltk.download('words')
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 assert device == "cuda"   # use gpu whenever you can!
@@ -29,8 +33,8 @@ epochs = 30
 max_len = 300
 
 
-train_dataset = WholeData(train_data_dir, use_max_len=True, max_len=max_len)
-test_dataset = WholeData(test_data_dir, use_max_len=True, max_len=max_len)
+train_dataset = WholeData(train_data_dir, src_vocab=words.words(), use_max_len=True, max_len=max_len)
+test_dataset = WholeData(test_data_dir, src_vocab=words.words(), use_max_len=True, max_len=max_len)
 
 train_dataloader = data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=8, pin_memory=True)
 test_dataloader = data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=True)
