@@ -79,8 +79,10 @@ class WholeData(data.Dataset):
         
         self.vocab = vocab_dict.keys()
 
-        # pad_index is reserved at 0
-        self.src_v2id = {v : i+1 for i, v in enumerate(self.vocab)}
+        # pad_index is reserved at 0, unk_index is reserved at 1
+        self.src_v2id = {v : i+2 for i, v in enumerate(self.vocab)}
+        self.src_v2id['<pad>'] = PAD_INDEX
+        self.src_v2id['<unk>'] = UNK_INDEX 
         self.src_id2v = {val : key for key, val in self.src_v2id.items()}
 
 
