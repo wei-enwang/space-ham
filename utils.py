@@ -145,8 +145,8 @@ def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, opti
             print(f"Training loss: {train_loss:>5f}, avg accuracy: {train_acc:>3f}")
             print(f"Testing loss: {test_loss:>5f}, avg accuracy: {test_acc:>3f}")
 
-    plot_train_test_loss(epochs, loss_list, test_loss_list, title=task_name+" training loss", filename=img_dir+task_name+"train_loss")
-    plot_acc(epochs, acc_list, test_acc_list, title=task_name+" training accuracy", filename=img_dir+task_name+"train_acc")
+    plot_train_test_loss(epochs, loss_list, test_loss_list, title=task_name+" loss", filename=img_dir+task_name+"train_loss")
+    plot_acc(epochs, acc_list, test_acc_list, title=task_name+" accuracy", filename=img_dir+task_name+"train_acc")
 
     test_loss, test_acc = test_loop(test_dataloader, model, loss_fn, device)
     print(f"Final testing loss: {test_loss:>5f}, testing accuracy: {test_acc:>3f}")
