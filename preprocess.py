@@ -87,7 +87,7 @@ class WholeData(data.Dataset):
             self.context.append(context)
             self.label_list.append(0)
         
-        if src_vocab is not None:
+        if not src_vocab is None:
             self.vocab = src_vocab
         else:
             self.vocab = vocab_dict.keys()
