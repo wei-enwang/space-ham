@@ -21,7 +21,7 @@ MAX_SENT_LENGTH = 100
 
 
 # Remove all punctuations and stopwords using ntlk
-def txt2list(filename):
+def txt2list(filename, max_len=None):
     context = []
     with io.open(filename, "r", encoding="ascii", errors="ignore") as f:
         for line in f:
@@ -31,6 +31,9 @@ def txt2list(filename):
             # Remove stop words
             context.extend([word for word in line.strip().split()
                             if word not in stopwords.words('english')])
+            if not max_len is None:
+                if len(context) >= max_len:
+                    break
 
     return context
 
