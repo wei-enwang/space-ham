@@ -46,6 +46,7 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
     """
     num_batches = len(dataloader)
     total_loss = 0
+    correct_cases = 0
     # counter for printing training loss
     # cnt = 0
 
@@ -63,18 +64,20 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
         loss.backward()
         optimizer.step()
         total_loss += loss.item()
+        correct_cases += torch.sum(torch.squeeze(pred) == y).item()/X.shape[0]
         # if cnt % 100:
         #    print(f"Current avg loss:{total_loss/(cnt+1)}\n")
         # cnt += 1   
     # print(f"Training loss: {total_loss/num_batches:>5f}")
     
-    return total_loss/num_batches
+    return total_loss/num_batches, correct_cases/num_batches
 
 
 def test_loop(dataloader, model, loss_fn, device):
 
     num_batches = len(dataloader)
     total_loss = 0
+    correct_cases = 0
 
     model.eval()
     with torch.no_grad():
@@ -83,8 +86,9 @@ def test_loop(dataloader, model, loss_fn, device):
             pred = model(X)
             # squeeze to match the dimensions of pred and y
             total_loss += loss_fn(torch.squeeze(pred), y.float()).item()
+            correct_cases += torch.sum(torch.squeeze(pred) == y).item()/X.shape[0]
 
-    return total_loss/num_batches
+    return total_loss/num_batches, correct_cases/num_batches
 
 def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, optimizer, 
                          device="cuda", epochs=100, vis=False, print_every=5, img_dir=""):
@@ -119,15 +123,15 @@ def train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, opti
 
     loss_list = []
     for t in tqdm(range(epochs)):
-        train_loss = train_loop(train_dataloader, model, loss_fn, optimizer, device)
+        train_loss, train_acc = train_loop(train_dataloader, model, loss_fn, optimizer, device)
         loss_list.append(train_loss)
         if t % print_every == 0:
             print(f"Epoch {t}\n-------------------------------")
-            print(f"Training loss: {train_loss:>5f}")
+            print(f"Training loss: {train_loss:>5f}, avg accuracy: {train_acc:>3f}")
 
     plot_loss(epochs, loss_list, title="baseline model(training)", filename=img_dir+"train_loss")
-    test_loss = test_loop(test_dataloader, model, loss_fn, device)
-    print(f"Final testing loss: {test_loss:>5f}")
+    test_loss, test_acc = test_loop(test_dataloader, model, loss_fn, device)
+    print(f"Final testing loss: {test_loss:>5f}, testing accuracy: {test_acc:>3f}")
 
     return train_loss, test_loss
 
