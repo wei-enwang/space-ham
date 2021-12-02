@@ -4,4 +4,6 @@ data/
 *.tar
 *.txt
 *.pyc
+*.pt
+*.pth
 fastText/
