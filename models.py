@@ -76,6 +76,6 @@ class spam_lstm(nn.Module):
 
         # Apply LSTM to input, Output shape: (b, max_len, hidden_size)
         output, _ = self.rnn(x_embed)
-        x = self.fc(output)
+        x = self.fc(output[...,-1])
 
         return x

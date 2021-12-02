@@ -19,11 +19,13 @@ torch.cuda.manual_seed(seed)
 # use one dataset for now
 train_data_dir = "./data/enron1/"
 test_data_dir = "./data/enron2/"
+output_dir = "./output/"
 
 # hyperparameters
 batch_size = 128
 dropout = 0.1
 learning_rate = 1e-3
+epochs = 30
 
 train_dataset = WholeData(train_data_dir)
 test_dataset = WholeData(test_data_dir)
@@ -38,4 +40,6 @@ model = models.spam_lstm(pretrained_embedding=embed, dropout=dropout).to(device)
 loss_fn = nn.BCEWithLogitsLoss().to(device)
 opt = Adam(model.parameters(), lr=learning_rate)
 
-utils.train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, optimizer=opt)
+utils.train_full_test_once(train_dataloader, test_dataloader, model, loss_fn, optimizer=opt, print_every=1, img_dir=output_dir)
+
+torch.save(model.state_dict(), output_dir+"w2v_lstm.pt")
