@@ -101,6 +101,6 @@ class WholeData(data.Dataset):
         src_id = (sent_id + [PAD_INDEX] * (self.max_len - sent_len))
 
         # Return context length?
-        return torch.tensor(src_id), label
+        return torch.tensor(src_id), torch.tensor(label)
 
 

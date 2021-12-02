@@ -76,6 +76,7 @@ class spam_lstm(nn.Module):
 
         # Apply LSTM to input, Output shape: (b, max_len, hidden_size)
         output, _ = self.rnn(x_embed)
-        x = self.fc(output[...,-1])
+        # fc takes in tensor of shape (..., hidden_size)
+        x = self.fc(output[:,-1,:])
 
         return x
