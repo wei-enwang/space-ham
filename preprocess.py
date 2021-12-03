@@ -43,8 +43,31 @@ def txt2list(filename, max_len=None):
 
     return context
 
-# Update vocabulary
+
+def clean_text(filename):
+    """
+    Remove all punctuations and stopwords using ntlk
+    Return:
+    - context: a list of strings
+    """
+    context = ""
+    with io.open(filename, "r", encoding="ascii", errors="ignore") as f:
+        for line in f:
+            # Remove punctuations
+            line = [char for char in line if char not in string.punctuation]
+            line = ''.join(line)
+            # Remove stop words
+            word_list = [word.lower() for word in line.strip().split()
+                            if word not in stopwords.words('english')]
+            context += ' '.join(word_list) +' '
+
+    return context
+
+
 def build_vocab(vocab_dict, context):
+    """
+    Build the vocabulary if not given word embeddings
+    """
 
     for word in context:
         try:
@@ -70,7 +93,7 @@ class tdData(object):
 
         for filename in good_mails:
 
-            context = txt2list(filename)
+            context = clean_text(filename)
 
             # add the content of a single email to dataset
             self.context.append(context)
@@ -78,7 +101,7 @@ class tdData(object):
 
         for filename in bad_mails:
 
-            context = txt2list(filename)
+            context = clean_text(filename)
 
             self.context.append(context)
             self.label_list.append(0)
