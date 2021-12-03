@@ -5,6 +5,8 @@ data/
 *.tar
 *.txt
 *.pyc
+
+*.pkl
 *.pt
 *.pth
 fastText/
