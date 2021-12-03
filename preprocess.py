@@ -70,17 +70,17 @@ class tdData(object):
 
         for filename in good_mails:
 
-            context = txt2list(filename)
+            # context = txt2list(filename)
 
             # add the content of a single email to dataset
-            self.context.append(context)
+            self.context.append(filename)
             self.label_list.append(1)
 
         for filename in bad_mails:
 
-            context = txt2list(filename)
+            # context = txt2list(filename)
 
-            self.context.append(context)
+            self.context.append(filename)
             self.label_list.append(0)
         
         self.label_list = np.array(self.label_list)
