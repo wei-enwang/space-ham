@@ -1,13 +1,14 @@
 import torch
 from torch.utils import data
+import numpy as np
 import os.path
 import io
+import os
 import glob
 import pdb
 import string
 import nltk
 from nltk.corpus import stopwords
-from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 nltk.download('stopwords')
@@ -21,8 +22,12 @@ EOS_INDEX = 3
 MAX_SENT_LENGTH = 100
 
 
-# Remove all punctuations and stopwords using ntlk
 def txt2list(filename, max_len=None):
+    """
+    Remove all punctuations and stopwords using ntlk
+    Return:
+    - context: a list of strings
+    """
     context = []
     with io.open(filename, "r", encoding="ascii", errors="ignore") as f:
         for line in f:
@@ -46,6 +51,40 @@ def build_vocab(vocab_dict, context):
             vocab_dict[word] += 1
         except:
             vocab_dict[word] = 0
+
+
+class tdData(object):
+    """
+    Dataset class for tfidf
+    """
+    def __init__(self, data_dir):
+
+        ham_path = os.path.join(data_dir, "ham/")
+        spam_path = os.path.join(data_dir, "spam/")
+
+        good_mails = glob.glob(ham_path+"*.txt")
+        bad_mails = glob.glob(spam_path+"*.txt")
+
+        self.context = []
+        self.label_list = []
+
+        for filename in good_mails:
+
+            context = txt2list(filename)
+
+            # add the content of a single email to dataset
+            self.context.append(context)
+            self.label_list.append(1)
+
+        for filename in bad_mails:
+
+            context = txt2list(filename)
+
+            self.context.append(context)
+            self.label_list.append(0)
+        
+        self.label_list = np.array(self.label_list)
+
 
 
 class WholeData(data.Dataset):
