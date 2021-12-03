@@ -79,10 +79,11 @@ class spam_lstm(nn.Module):
 
         super().__init__()
         # Embedding layer
-        if pretrained_embedding is not None:
+        if not pretrained_embedding is None:
             self.vocab_size, self.embed_dim = pretrained_embedding.shape
             self.embed = nn.Embedding.from_pretrained(pretrained_embedding,
                                                         freeze=freeze_embedding)
+            print("Using pretrained vectors...")
         else:
             self.embed_dim = embed_dim
             self.embed = nn.Embedding(num_embeddings=vocab_size,
