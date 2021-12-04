@@ -96,7 +96,12 @@ class tdData(object):
         self.context = []
         self.label_list = []
 
-        for filename in good_mails:
+        mask = np.random.choice(len(good_mails), len(bad_mails), replace=False)
+
+        for i, filename in enumerate(good_mails):
+
+            if not i in mask:
+                continue
 
             context = clean_text(filename)
 
