@@ -21,6 +21,11 @@ EOS_INDEX = 3
 
 MAX_SENT_LENGTH = 100
 
+seed = 32
+np.random.seed(seed)
+torch.manual_seed(seed)
+torch.cuda.manual_seed(seed)
+
 
 def txt2list(filename, max_len=None):
     """
@@ -120,7 +125,6 @@ class WholeData(data.Dataset):
 
         good_mails = glob.glob(ham_path+"*.txt")
         bad_mails = glob.glob(spam_path+"*.txt")
-
         
 
         vocab_dict = {}
@@ -191,4 +195,74 @@ class WholeData(data.Dataset):
         return torch.tensor(sent_id), label
 
 
+class BalancedData(WholeData):
+    def __init__(self, data_dir, src_vocab=None, max_len=MAX_SENT_LENGTH, use_max_len=False):
 
+        self.max_len = max_len
+        ham_path = os.path.join(data_dir, "ham/")
+        spam_path = os.path.join(data_dir, "spam/")
+
+        good_mails = glob.glob(ham_path+"*.txt")
+        bad_mails = glob.glob(spam_path+"*.txt")
+        
+        vocab_dict = {}
+        self.context = []
+        self.label_list = []
+
+        # number of spam mails are less than ham emails
+        mask = np.random.choice(len(good_mails), len(bad_mails), replace=False)
+
+        for i, filename in enumerate(good_mails):
+
+            if not i in mask:
+                continue
+            if use_max_len:
+                context = txt2list(filename, max_len)
+            else:
+                context = txt2list(filename)
+
+            if not use_max_len:
+                self.max_len = max(self.max_len, len(context))
+
+            if src_vocab is None:
+                build_vocab(vocab_dict, context)
+    
+            # add the content of a single email to dataset
+            self.context.append(context)
+            self.label_list.append(1)
+        
+        num_ham = len(self.label_list)
+
+        for filename in bad_mails:
+            if use_max_len:
+                context = txt2list(filename, max_len)
+            else:
+                context = txt2list(filename)
+
+            if not use_max_len:
+                self.max_len = max(self.max_len, len(context))
+            
+            if src_vocab is None:
+                build_vocab(vocab_dict, context)
+
+            self.context.append(context)
+            self.label_list.append(0)
+        
+        if not src_vocab is None:
+            self.vocab = src_vocab
+        else:
+            self.vocab = vocab_dict.keys()
+
+        # pad_index is reserved at 0, unk_index is reserved at 1
+        self.src_v2id = {v : i+2 for i, v in enumerate(self.vocab)}
+        self.src_v2id['<pad>'] = PAD_INDEX
+        self.src_v2id['<unk>'] = UNK_INDEX 
+        self.src_id2v = {val : key for key, val in self.src_v2id.items()}
+
+        print(f"Number of ham emails: {num_ham}, spam emails: {len(self.label_list) - num_ham}")
+
+    def __len__(self):
+        return super().__len__()
+
+    def __getitem__(self, index):
+        return super().__getitem__(index)
