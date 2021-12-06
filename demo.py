@@ -1,8 +1,7 @@
-from nltk import probability
 import torch
 import torch.nn as nn
 import joblib
-from preprocess import PAD_INDEX, clean_text
+from preprocess import PAD_INDEX, clean_string
 
 PAD_INDEX = 0
 
@@ -10,7 +9,7 @@ model_filename = "./output/balancew2v_lstm.pt"
 
 test_message = "Subject: we will make america great again"
 
-context = clean_text(test_message)
+context = clean_string(test_message)
 
 
 model = torch.load(model_filename)
