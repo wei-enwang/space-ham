@@ -38,7 +38,7 @@ class kNN():
         
         matrix = self.vectorizer.fit_transform(self.train_x)
         self.classifier.fit(matrix, self.train_y)
-        print(self.nb.score(matrix, self.train_y))
+        print(self.classifier.score(matrix, self.train_y))
 
     def test(self, test_data_dir):
 

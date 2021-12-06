@@ -17,4 +17,4 @@ model = models.kNN(train_data_dir, use_tfidf=False)
 model.fit()
 model.test(test_data_dir)
 
-joblib.dump(model, output_dir+"cv_knn.pkl")
+#joblib.dump(model, output_dir+"cv_knn.pkl")
