@@ -1,4 +1,4 @@
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.metrics import classification_report
 from sklearn.naive_bayes import MultinomialNB
 import numpy as np
@@ -11,14 +11,17 @@ from preprocess import tdData
 
 class naive_bayes():
     """NB for Spam classification"""
-    def __init__(self, data_dir):
+    def __init__(self, data_dir, use_tfidf=True):
         
         dataset = tdData(data_dir)
 
         self.train_x = dataset.context
         self.train_y = dataset.label_list
 
-        self.vectorizer = TfidfVectorizer()
+        if use_tfidf:
+            self.vectorizer = TfidfVectorizer()
+        else:
+            self.vectorizer = CountVectorizer()
         self.nb = MultinomialNB()
     
     
