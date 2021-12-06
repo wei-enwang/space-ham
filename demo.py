@@ -14,7 +14,7 @@ max_len = 100
 model_filename = "./output/balancew2v_lstmhid128.pt"
 train_data_dir = "./data/enron1/"
 
-test_message = "Subject: we will make america great again"
+test_message = "Subject: 24900 paper 2 revision ideas. Hello Katie, I am working on the paper 2 revision assignment and would like to ask if my plans sound good to you. I think the main issue of my paper is it lacks good transitions between some sections. I decide to work specifically on the syntax section, where I could try to incorporate the alternative hypothesis I proposed in the conclusion into the syntax section and also try to make the whole section more concise. Would love to hear your thoughts! Best, Warren"
 
 
 vocab = set([str.lower() for str in words.words()])
