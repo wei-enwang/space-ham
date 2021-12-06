@@ -69,6 +69,21 @@ def clean_text(filename):
     return context
 
 
+def clean_string(str, max_len=100):
+    context = []
+    # Remove punctuations
+    line = [char for char in str if char not in string.punctuation]
+    line = ''.join(line)
+    # Remove stop words
+    context.extend([word.lower() for word in line.strip().split()
+                    if word not in stopwords.words('english')])
+    if not max_len is None:
+        if len(context) >= max_len:
+            return context
+
+    return context
+
+
 def build_vocab(vocab_dict, context):
     """
     Build the vocabulary if not given word embeddings
