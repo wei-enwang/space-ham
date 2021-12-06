@@ -1,12 +1,52 @@
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.metrics import classification_report
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.neighbors import KNeighborsClassifier
 import numpy as np
 import torch
 import torch.nn as nn
 
 
 from preprocess import tdData
+
+class kNN():
+    """NB for Spam classification"""
+    def __init__(self, data_dir, use_tfidf=True):
+        
+        dataset = tdData(data_dir)
+
+        self.train_x = dataset.context
+        self.train_y = dataset.label_list
+
+        if use_tfidf:
+            self.vectorizer = TfidfVectorizer()
+        else:
+            self.vectorizer = CountVectorizer()
+        
+        self.classifier = KNeighborsClassifier()
+    
+    
+    def fit(self):
+        """
+        Must call this function to fit the model before inference.
+
+        Perform Tf-idf on text document
+        Return:
+            sparse matrix of (n_samples, n_features)
+            Tf-idf-weighted document-term matrix.
+        """
+        
+        matrix = self.vectorizer.fit_transform(self.train_x)
+        self.classifier.fit(matrix, self.train_y)
+        print(self.nb.score(matrix, self.train_y))
+
+    def test(self, test_data_dir):
+
+        test_dataset = tdData(test_data_dir)
+        test_x = self.vectorizer.transform(test_dataset.context)
+        test_y = test_dataset.label_list
+        pred = self.classifier.predict(test_x)
+        print(classification_report(test_y, pred))
 
 
 class naive_bayes():
