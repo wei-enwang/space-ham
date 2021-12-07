@@ -115,8 +115,8 @@ class tdData(object):
 
         for i, filename in enumerate(good_mails):
 
-#            if not i in mask:
-#                continue
+            if not i in mask:
+                continue
 
             context = clean_text(filename)
 

@@ -13,7 +13,7 @@ test_data_dir = "./data/enron2/"
 output_dir = "./output/"
 
 
-model = models.kNN(train_data_dir, use_tfidf=False)
+model = models.kNN(train_data_dir, use_tfidf=True)
 model.fit()
 model.test(test_data_dir)
 
