@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm_notebook, tqdm
 import torch
+import torch.nn.functional as F
 
 
 def load_pretrained_vectors(word2idx, filename):
@@ -41,6 +42,10 @@ def load_pretrained_vectors(word2idx, filename):
     return embeddings
 
 
+def sig(x):
+    return F.sigmoid(x)
+
+
 def train_loop(dataloader, model, loss_fn, optimizer, device):
     """
     Perform one epoch of training through the dataset.
@@ -62,7 +67,7 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
         pred = torch.squeeze(pred)
         # squeeze to match the dimensions of pred and y
         loss = loss_fn(pred, y.float())
-
+        pred = sig(pred)
         # Backpropagation
         optimizer.zero_grad()
         loss.backward()
@@ -103,6 +108,7 @@ def test_loop(dataloader, model, loss_fn, device, output_stats=False):
             pred = torch.squeeze(pred)
             # squeeze to match the dimensions of pred and y
             total_loss += loss_fn(pred, y.float()).item()
+            pred = sig(pred)
             correct_cases += torch.sum((pred>0.5) == (y>0)).item()/X.shape[0]
             true_pos += torch.sum((pred>0.5) & (y>0)).item()
             total_pos += torch.sum((pred>0.5)).item()
