@@ -13,7 +13,7 @@ test_data_dir = "./data/enron2/"
 output_dir = "./output/"
 
 
-model = models.LogReg(train_data_dir, use_tfidf=True)
+model = models.LogReg(train_data_dir, use_tfidf=False)
 model.fit()
 model.test(test_data_dir)
 
