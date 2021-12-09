@@ -99,6 +99,9 @@ def test_loop(dataloader, model, loss_fn, device, output_stats=False):
     true_pos = 0
     total_pos = 0
     actual_pos = 0
+    true_neg = 0
+    total_neg = 0
+    actual_neg = 0
 
     model.eval()
     with torch.no_grad():
@@ -114,10 +117,18 @@ def test_loop(dataloader, model, loss_fn, device, output_stats=False):
             total_pos += torch.sum((pred>0.5)).item()
             actual_pos += torch.sum((y>0)).item()
 
+            true_neg += torch.sum((pred<=0.5) & (y==0)).item()
+            total_neg += torch.sum((pred<=0.5)).item()
+            actual_neg += torch.sum((y==0)).item()
+
     if output_stats:
-        precision = true_pos/total_pos
-        recall = true_pos/actual_pos
-        return total_loss/num_batches, correct_cases/num_batches, precision, recall
+        precision_ham = true_pos/total_pos
+        recall_ham = true_pos/actual_pos
+
+        precision_spam = true_neg/total_neg
+        recall_spam = true_neg/actual_neg
+
+        return total_loss/num_batches, correct_cases/num_batches, precision_ham, recall_ham, precision_spam, recall_spam
     else:
         return total_loss/num_batches, correct_cases/num_batches
 
@@ -235,9 +246,11 @@ def train_test_scheme(train_dataloader, test_dataloader, model, loss_fn, optimiz
         plot_train_test_loss(epochs, loss_list, test_loss_list, title=task_name+" loss", filename=img_dir+task_name+"train_loss")
         plot_train_test_acc(epochs, acc_list, test_acc_list, title=task_name+" accuracy", filename=img_dir+task_name+"train_acc")
 
-    test_loss, test_acc, precision, recall = test_loop(test_dataloader, model, loss_fn, device, output_stats=True)
+    test_loss, test_acc, precision_ham, recall_ham, precision_spam, recall_spam = test_loop(test_dataloader, model, loss_fn, device, output_stats=True)
     print(f"Final testing loss: {test_loss:>5f}, testing accuracy: {test_acc:>3f}")
-    print(f"F1 score: {2*precision*recall/(precision+recall):3f} Precision: {precision:3f}, Recall: {recall:3f}")
+    print(f"Ham Precision: {precision_ham:3f}, Recall: {recall_ham:3f}, F1 score: {2*precision_ham*recall_ham/(precision_ham+recall_ham):3f}.")
+    print(f"Ham Precision: {precision_spam:3f}, Recall: {recall_spam:3f}, F1 score: {2*precision_spam*recall_spam/(precision_spam+recall_spam):3f}.")
+
 
     return train_loss, test_loss
 
