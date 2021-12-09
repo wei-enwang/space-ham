@@ -48,7 +48,7 @@ class LogReg():
         test_x = self.vectorizer.transform(test_dataset.context)
         test_y = test_dataset.label_list
         pred = self.classifier.predict(test_x)
-        print(classification_report(test_y, pred))
+        print(classification_report(test_y, pred, digits=4))
 
 
 class kNN():
@@ -88,7 +88,7 @@ class kNN():
         test_x = self.vectorizer.transform(test_dataset.context)
         test_y = test_dataset.label_list
         pred = self.classifier.predict(test_x)
-        print(classification_report(test_y, pred))
+        print(classification_report(test_y, pred, digits=4))
 
 
 class naive_bayes():
@@ -127,7 +127,7 @@ class naive_bayes():
         test_x = self.vectorizer.transform(test_dataset.context)
         test_y = test_dataset.label_list
         pred = self.nb.predict(test_x)
-        print(classification_report(test_y, pred))
+        print(classification_report(test_y, pred, digits=4))
 
 
 class spam_lstm(nn.Module):
