@@ -13,8 +13,8 @@ test_data_dir = "./data/enron2/"
 output_dir = "./output/"
 
 
-model = models.naive_bayes(train_data_dir, use_tfidf=False)
+model = models.naive_bayes(train_data_dir, use_tfidf=True)
 model.fit()
 model.test(test_data_dir)
 
-joblib.dump(model, output_dir+"cv_nb.pkl")
+#joblib.dump(model, output_dir+"cv_nb.pkl")
